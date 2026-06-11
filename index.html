@@ -464,6 +464,12 @@ function buildMap() {
 
   // 길(산책로)
   let roadsHtml = '<g filter="url(#crayonSoft)">';
+  const ring = floor.roads.ring;
+  if (ring) {
+    // 단지 외곽 순환도로
+    roadsHtml += `<rect x="${ring.x}" y="${ring.y}" width="${ring.w}" height="${ring.h}" rx="26"
+                   fill="none" stroke="#E3D2AE" stroke-width="3" stroke-dasharray="14 10"/>`;
+  }
   const rv = floor.roads.v;
   if (rv) {
     roadsHtml += `<rect x="${rv.x}" y="${rv.y}" width="${rv.w}" height="${rv.h}" rx="18"
@@ -483,7 +489,7 @@ function buildMap() {
   let decoHtml = '';
   floor.deco.forEach(d => {
     decoHtml += `<text class="decoText" x="${d.x}" y="${d.y}" text-anchor="middle"
-                  font-size="${d.s}">${d.text}</text>`;
+                  font-size="${d.s}"${d.c ? ` style="fill:${d.c}"` : ''}>${d.text}</text>`;
   });
 
   svg.innerHTML = defs + roadsHtml + decoHtml;
@@ -504,11 +510,16 @@ function buildMap() {
     outline.setAttribute('stroke-dasharray', '7 6');
     gAll.appendChild(outline);
 
+    // 동 라벨: 안내판처럼 바깥 모서리에 (F·E·D 왼쪽, A·B·C 오른쪽)
+    let cx, cy;
+    if (b.labelSide === 'left')       { cx = Math.max(4, b.x - 54); cy = b.y + bh/2 - 15; }
+    else if (b.labelSide === 'right') { cx = b.x + bw + 10;         cy = b.y + bh/2 - 15; }
+    else                              { cx = b.x - 1;               cy = b.y - 40; }
     const chip = document.createElementNS(NS, 'g');
-    chip.setAttribute('transform', `rotate(${(rndB()-0.5)*4} ${b.x+27} ${b.y-24})`);
+    chip.setAttribute('transform', `rotate(${(rndB()-0.5)*4} ${cx+23} ${cy+15})`);
     chip.innerHTML =
-      `<rect x="${b.x-1}" y="${b.y-40}" width="56" height="30" rx="13" fill="${b.chip}" stroke="${b.stroke}" stroke-width="2.5"/>
-       <text class="bldgChip" x="${b.x+27}" y="${b.y-18}" text-anchor="middle" font-size="20" fill="#FFFFFF"
+      `<rect x="${cx}" y="${cy}" width="46" height="30" rx="13" fill="${b.chip}" stroke="${b.stroke}" stroke-width="2.5"/>
+       <text class="bldgChip" x="${cx+23}" y="${cy+22}" text-anchor="middle" font-size="19" fill="#FFFFFF"
              stroke="${b.stroke}" stroke-width=".6">${b.id}동</text>`;
     gAll.appendChild(chip);
   });
