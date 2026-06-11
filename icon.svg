@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 종이 배경 (iOS가 모서리를 자체적으로 둥글게 깎으므로 풀블리드) -->
+  <rect width="512" height="512" fill="#FFF8EE"/>
+  <!-- 파스텔 블록 4개 = 상가 동들 -->
+  <rect x="74" y="84" width="156" height="116" rx="26" fill="#CFEAC8" stroke="#7FB873" stroke-width="11" transform="rotate(-2 152 142)"/>
+  <rect x="282" y="84" width="156" height="116" rx="26" fill="#FFE3BD" stroke="#E8A85C" stroke-width="11" transform="rotate(3 360 142)"/>
+  <rect x="74" y="236" width="156" height="116" rx="26" fill="#FAEFB4" stroke="#CDB54E" stroke-width="11" transform="rotate(2 152 294)"/>
+  <rect x="282" y="236" width="156" height="116" rx="26" fill="#E2D9F8" stroke="#9C8AD6" stroke-width="11" transform="rotate(-3 360 294)"/>
+  <!-- 가운데 산책길 -->
+  <line x1="256" y1="70" x2="256" y2="370" stroke="#E8D8B8" stroke-width="14" stroke-dasharray="22 18" stroke-linecap="round"/>
+  <!-- 크레파스 -->
+  <g transform="rotate(-12 256 430)">
+    <rect x="130" y="406" width="210" height="52" rx="16" fill="#FF8A65" stroke="#D96B49" stroke-width="9"/>
+    <path d="M 340 410 L 392 432 L 340 454 Z" fill="#E2674A"/>
+    <rect x="160" y="406" width="18" height="52" fill="#D96B49" opacity=".5"/>
+  </g>
+</svg>

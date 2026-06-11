@@ -1,0 +1,14 @@
+{
+  "name": "하우스디어반 동네 한바퀴",
+  "short_name": "어반한바퀴",
+  "description": "대전 도룡동 하우스디어반 상가 크레파스 지도 & 방문 기록",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#FFF8EE",
+  "theme_color": "#FFF8EE",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

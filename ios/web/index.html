@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- iPhone 홈 화면 추가 시 standalone 앱처럼 동작 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="어반한바퀴">
+<meta name="theme-color" content="#FFF8EE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>하우스디어반 동네 한바퀴 🖍️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:   #FFF8EE;
+    --ink:     #5B4A3F;
+    --ink-soft:#8C7A6B;
+    --accent:  #FF8A65;
+    --card:    #FFFFFF;
+    --star:    #FFB300;
+    --shadow:  0 4px 18px rgba(91,74,63,.13);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: 'Gaegu', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      radial-gradient(rgba(91,74,63,.035) 1px, transparent 1.4px),
+      radial-gradient(rgba(91,74,63,.025) 1px, transparent 1.4px);
+    background-size: 28px 28px, 17px 17px;
+    background-position: 0 0, 9px 13px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ---------- 헤더 ---------- */
+  header {
+    padding: 14px 18px 4px;
+    display:flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 27px; margin: 0; font-weight: 700; letter-spacing: -.5px; }
+  header .stamp {
+    font-size: 16px; color: var(--ink-soft);
+    background:#FFEFD9; border: 2px dashed #EFC089;
+    border-radius: 14px; padding: 1px 11px;
+  }
+
+  /* ---------- 탭 ---------- */
+  nav.tabs { display:flex; gap:8px; padding: 8px 18px 2px; align-items:center; }
+  nav.tabs button {
+    font-family: inherit; font-size: 18px; font-weight: 700;
+    border: 2.5px solid transparent; background: transparent; color: var(--ink-soft);
+    padding: 3px 14px; border-radius: 16px; cursor: pointer;
+  }
+  nav.tabs button.on {
+    color: var(--ink); background: #FFE6CE; border-color:#F0B47E;
+    transform: rotate(-1deg);
+  }
+  nav.tabs .editToggle {
+    margin-left: auto; border: 2px dashed #D9B98D !important; color: var(--ink-soft);
+  }
+  nav.tabs .editToggle.on {
+    background: #FFE2A8; border-color: #E0A85C !important; color: var(--ink);
+    transform: rotate(1deg);
+  }
+
+  #editBar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin: 0 18px 6px; padding: 7px 14px;
+    background: #FFF2D6; border: 2px dashed #E0B97E; border-radius: 14px;
+    font-size: 16px;
+  }
+  #editBar button {
+    font-family: inherit; font-size: 15px; cursor: pointer; color: var(--ink);
+    border: 2px solid #E0A85C; background: #fff; border-radius: 12px; padding: 2px 11px;
+  }
+  #selBar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin: 0 18px 6px; padding: 7px 14px;
+    background: #FFE9E0; border: 2.5px solid #FF8A65; border-radius: 14px;
+    font-size: 16px;
+  }
+  #selBar button {
+    font-family: inherit; font-size: 15px; cursor: pointer; color: var(--ink);
+    border: 2px solid #FF8A65; background: #fff; border-radius: 12px; padding: 2px 11px;
+  }
+
+  /* ---------- 필터 줄 ---------- */
+  .filters {
+    display:flex; gap:7px; align-items:center;
+    padding: 8px 18px; overflow-x:auto; scrollbar-width:none;
+  }
+  .filters::-webkit-scrollbar{ display:none; }
+  .filters input[type=search] {
+    font-family:inherit; font-size:16px; color:var(--ink);
+    border: 2px solid #E2CFBA; border-radius: 14px; background:#fff;
+    padding: 4px 12px; width: 150px; outline:none; flex: 0 0 auto;
+  }
+  .filters .chip {
+    flex: 0 0 auto; font-family:inherit; font-size: 15px; cursor:pointer;
+    border: 2px solid #E2CFBA; background: #fff; color: var(--ink-soft);
+    padding: 2px 11px; border-radius: 14px;
+  }
+  .filters .chip.on { background:#FFD9B8; border-color:#E89B5F; color:var(--ink); }
+
+  /* ---------- 층 전환 ---------- */
+  .floorSwitch {
+    display: inline-flex; gap: 0; margin: 0 0 0 18px;
+    border: 2.5px solid #E0A86C; border-radius: 16px; overflow: hidden;
+    background: #fff;
+  }
+  .floorSwitch button {
+    font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+    border: none; background: transparent; color: var(--ink-soft);
+    padding: 3px 18px;
+  }
+  .floorSwitch button.on { background: #FFD9B8; color: var(--ink); }
+
+  /* ---------- 지도 ---------- */
+  #mapWrap {
+    margin: 8px 12px; border-radius: 22px; overflow: auto;
+    max-height: 78vh;
+    background: #FDF3E3;
+    border: 3px solid #EAD7BC;
+    box-shadow: var(--shadow);
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+  #mapHolder { display: flex; justify-content: center; }
+  #mapSvg { display:block; touch-action: pan-x pan-y; }
+  .zoomBtns {
+    position: sticky; left: calc(100% - 92px); bottom: 12px;
+    display: inline-flex; gap: 6px; margin: 0 12px 12px 0;
+  }
+  .zoomBtns button {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2.5px solid #E0A86C; background: #FFF4E2; color: var(--ink);
+    font-size: 21px; font-family: inherit; cursor:pointer; line-height: 1;
+    box-shadow: var(--shadow);
+  }
+
+  .blk { cursor: pointer; }
+  .blk path.body { transition: opacity .25s; }
+  .blk.dim { opacity: .18; }
+  .blk:active path.body { filter: brightness(.96); }
+  .blkLabel {
+    font-family: 'Gaegu', sans-serif; fill: var(--ink);
+    pointer-events: none; font-weight: 700;
+  }
+  .blkStars { font-family:'Gaegu',sans-serif; fill:#A8541E; pointer-events:none; }
+  .bldgChip { font-family:'Gaegu',sans-serif; font-weight:700; }
+  .decoText { font-family:'Gaegu',sans-serif; fill:#B59B6F; pointer-events:none; }
+
+  /* ---------- 리스트/피드 ---------- */
+  .page { padding: 4px 16px 90px; }
+  .card {
+    background: var(--card); border-radius: 18px; box-shadow: var(--shadow);
+    padding: 12px 16px; margin: 10px 0; border: 2px solid #F1E4D2;
+  }
+  .card h3 { margin: 0; font-size: 20px; display:flex; gap:8px; align-items:center; }
+  .card .sub { color: var(--ink-soft); font-size: 15px; margin-top: 2px; }
+  .card .stars { color: var(--star); font-size: 18px; letter-spacing: 1px; }
+  .medal { font-size: 22px; }
+  .feedPhotos { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .feedPhotos img {
+    width: 74px; height: 74px; object-fit: cover; border-radius: 12px;
+    border: 2px solid #F1E4D2; cursor: pointer;
+  }
+  .empty { text-align:center; color:var(--ink-soft); font-size:18px; padding: 50px 0; }
+
+  /* ---------- 바텀 시트 ---------- */
+  #dimmer {
+    position: fixed; inset: 0; background: rgba(70,55,40,.35);
+    opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50;
+  }
+  #dimmer.show { opacity:1; pointer-events:auto; }
+  #sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--paper);
+    border-radius: 26px 26px 0 0; border: 3px solid #EAD7BC; border-bottom: none;
+    max-height: 86vh; overflow-y: auto;
+    transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.9,.3,1);
+    padding: 10px 20px calc(24px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 30px rgba(91,74,63,.25);
+  }
+  #sheet.show { transform: translateY(0); }
+  #sheet .grip { width: 44px; height: 5px; border-radius: 3px; background:#D9C6AE; margin: 4px auto 10px; }
+  #sheet h2 { margin: 2px 0 0; font-size: 26px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #sheet .units { color: var(--ink-soft); font-size: 16px; }
+  #sheet .catChip {
+    font-size: 14px; background: #FFE6CE; border: 2px solid #F0B47E;
+    padding: 0 10px; border-radius: 12px; color: var(--ink);
+  }
+  #sheet .avgLine { font-size: 19px; margin: 6px 0 2px; }
+  #sheet .avgLine .stars { color: var(--star); letter-spacing: 2px; }
+  .unverified { font-size: 14px; color: #B0763B; background: #FFF1DC; border-radius: 10px; padding: 4px 10px; margin-top: 6px; display:inline-block;}
+  #sheet input.nameInput {
+    width: 100%; font-family: inherit; font-size: 19px; color: var(--ink);
+    border: 2px solid #EADBC5; border-radius: 12px; padding: 6px 10px;
+    background: #FFFDF8; outline: none; margin-top: 10px;
+  }
+  .editActions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .editActions button {
+    font-family: inherit; font-size: 17px; text-align: left; cursor: pointer;
+    border: 2px solid #E0C9A8; background: #fff; border-radius: 12px;
+    padding: 8px 12px; color: var(--ink);
+  }
+  .editActions button.primary {
+    background: var(--accent); color: #fff; border: none; font-weight: 700;
+    box-shadow: 0 3px 0 #D96B49;
+  }
+  .catSelect { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .catSelect button {
+    font-family: inherit; font-size: 14px; cursor: pointer; color: var(--ink-soft);
+    border: 2px solid #E2CFBA; background: #fff; border-radius: 12px; padding: 1px 9px;
+  }
+  .catSelect button.on { background:#FFD9B8; border-color:#E89B5F; color:var(--ink); }
+
+  /* 리뷰 작성 폼 */
+  .formBox {
+    background:#fff; border: 2px dashed #E0C9A8; border-radius: 18px;
+    padding: 12px 14px; margin: 12px 0;
+  }
+  .starInput { display:flex; gap: 4px; font-size: 34px; cursor:pointer; user-select:none; }
+  .starInput span { color: #E4D7C3; transition: transform .1s; }
+  .starInput span.on { color: var(--star); }
+  .starInput span:active { transform: scale(1.25); }
+  .formBox textarea {
+    width: 100%; font-family: inherit; font-size: 17px; color: var(--ink);
+    border: 2px solid #EADBC5; border-radius: 12px; padding: 8px 10px;
+    min-height: 64px; resize: vertical; outline: none; margin-top: 8px; background:#FFFDF8;
+  }
+  .photoRow { display:flex; gap:8px; margin-top:8px; flex-wrap: wrap; align-items:center; }
+  .photoRow .addBtn {
+    width: 64px; height: 64px; border-radius: 14px; border: 2.5px dashed #D9B98D;
+    background: #FFF8EC; font-size: 26px; color: #C49A5E; cursor: pointer;
+  }
+  .photoRow .thumb { position: relative; }
+  .photoRow .thumb img {
+    width: 64px; height: 64px; object-fit: cover; border-radius: 14px; border: 2px solid #EAD7BC;
+  }
+  .photoRow .thumb button {
+    position:absolute; top:-7px; right:-7px; width: 22px; height: 22px;
+    border-radius: 50%; border:none; background:#5B4A3F; color:#fff; font-size: 13px;
+    cursor:pointer; line-height: 1;
+  }
+  .saveBtn {
+    margin-top: 12px; width: 100%;
+    font-family: inherit; font-size: 20px; font-weight: 700;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 16px; padding: 9px 0; cursor: pointer;
+    box-shadow: 0 4px 0 #D96B49;
+  }
+  .saveBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 #D96B49; }
+
+  /* 리뷰 리스트 */
+  .review { border-top: 2px dotted #E8D8C2; padding: 10px 2px; }
+  .review .head { display:flex; justify-content: space-between; align-items: baseline; }
+  .review .stars { color: var(--star); font-size: 17px; letter-spacing: 1px; }
+  .review .date { color: var(--ink-soft); font-size: 13px; }
+  .review p { margin: 4px 0 0; font-size: 17px; white-space: pre-wrap; }
+  .review .del {
+    background:none; border:none; color:#C7B299; font-family:inherit;
+    font-size: 13px; cursor:pointer; padding: 0; margin-top: 4px;
+  }
+
+  /* 사진 라이트박스 */
+  #lightbox {
+    position: fixed; inset: 0; z-index: 99; background: rgba(40,30,22,.92);
+    display: none; align-items: center; justify-content: center;
+  }
+  #lightbox.show { display: flex; }
+  #lightbox img { max-width: 94vw; max-height: 88vh; border-radius: 14px; }
+
+  @media (max-width: 560px) {
+    header h1 { font-size: 22px; }
+    nav.tabs button { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>하우스디어반 동네 한바퀴 🖍️</h1>
+  <span class="stamp" id="stampCount">🐾 스탬프 0개</span>
+</header>
+
+<nav class="tabs">
+  <button id="tabMap"  class="on" onclick="switchTab('map')">지도</button>
+  <button id="tabRank" onclick="switchTab('rank')">랭킹</button>
+  <button id="tabFeed" onclick="switchTab('feed')">피드</button>
+  <button id="editBtn" class="editToggle" onclick="toggleEdit()">✏️ 편집</button>
+</nav>
+
+<div id="editBar" style="display:none">
+  ✏️ 가게를 눌러 선택 → 드래그로 이동, 모서리 ⬤로 크기 조절!
+  <button onclick="addStore()">➕ 새 가게</button>
+  <button onclick="exportDataJs()">📥 data.js 내보내기</button>
+  <button onclick="resetTenants()">↩️ 파일 데이터로 초기화</button>
+</div>
+<div id="selBar" style="display:none"></div>
+
+<div class="filters" id="filterBar">
+  <input type="search" id="searchBox" placeholder="🔍 가게 찾기" oninput="applyFilter()">
+</div>
+
+<section id="pageMap">
+  <div class="floorSwitch" id="floorSwitch"></div>
+  <div id="mapWrap">
+    <div id="mapHolder"></div>
+    <div class="zoomBtns">
+      <button onclick="zoomMap(1.25)">＋</button>
+      <button onclick="zoomMap(0.8)">－</button>
+    </div>
+  </div>
+</section>
+
+<section id="pageRank" class="page" style="display:none"></section>
+<section id="pageFeed" class="page" style="display:none"></section>
+
+<div id="dimmer" onclick="closeSheet()"></div>
+<div id="sheet"></div>
+<div id="lightbox" onclick="this.classList.remove('show')"><img id="lightboxImg" alt=""></div>
+
+<input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+
+<script src="data.js"></script>
+<script>
+/* ================= 상태 & 저장소 ================= */
+const LS_KEY = 'hausd-urban-reviews-v1';
+let reviews = {};                 // { tenantId: [ {id, stars, text, photos[], ts} ] }
+try { reviews = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch (e) { reviews = {}; }
+const saveAll = () => {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(reviews)); }
+  catch (e) { alert('저장 공간이 가득 찼어요. 사진 수를 줄이거나 오래된 리뷰를 지워주세요.'); }
+};
+
+/* 입주 업체 데이터: data.js의 TENANTS가 원본,
+   편집 모드에서 고친 내용이 있으면 localStorage 사본 우선 */
+const LS_TENANTS = 'hausd-urban-tenants-v2';
+let tenants = (() => {
+  try {
+    const t = JSON.parse(localStorage.getItem(LS_TENANTS));
+    if (Array.isArray(t) && t.length && t[0].blocks) return t;
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(TENANTS));
+})();
+let tenantById = {};
+function rebuildIndexes() {
+  tenantById = {};
+  tenants.forEach(t => tenantById[t.id] = t);
+}
+rebuildIndexes();
+const saveTenants = () => localStorage.setItem(LS_TENANTS, JSON.stringify(tenants));
+
+let curFloor = '1F';
+let mapScale = 1;
+let curCat = '전체';
+let curTenant = null;
+let draftStars = 0;
+let draftPhotos = [];
+let editMode = false;
+let editCat = '기타';
+let onlyVisited = false;
+let sel = null;                   // 편집 모드에서 선택된 구역 { tid, bi }
+
+/* ================= 유틸 ================= */
+// 문자열 기반 결정적 난수 (크레파스 흔들림 — 새로고침해도 모양 유지)
+function seedRand(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 3266489917);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+}
+const avgOf = id => {
+  const rs = reviews[id] || [];
+  if (!rs.length) return null;
+  return rs.reduce((s, r) => s + r.stars, 0) / rs.length;
+};
+const starStr = n => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+const fmtDate = ts => {
+  const d = new Date(ts);
+  return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+};
+const floorOf = t => FLOORS.find(f => f.id === t.floor);
+const locLabel = t => {
+  const bs = [...new Set(t.blocks.map(k => k.b))];
+  return `${floorOf(t).label} ${bs.join('·')}동`;
+};
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ================= 지도 그리기 ================= */
+function crayonRectPath(x, y, w, h, r, rnd) {
+  // 모서리가 둥글고 변이 살짝 울퉁불퉁한 크레파스 사각형 path
+  const j = () => (rnd() - 0.5) * 3.2;
+  const pts = [];
+  const seg = (x1,y1,x2,y2) => {
+    const n = Math.max(1, Math.round(Math.hypot(x2-x1, y2-y1) / 34));
+    for (let i = 1; i <= n; i++)
+      pts.push([x1 + (x2-x1)*i/n + j(), y1 + (y2-y1)*i/n + j()]);
+  };
+  pts.push([x + r + j(), y + j()]);
+  seg(x+r, y,   x+w-r, y);
+  pts.push([x+w + j(), y+r + j()]);
+  seg(x+w, y+r, x+w,   y+h-r);
+  pts.push([x+w-r + j(), y+h + j()]);
+  seg(x+w-r, y+h, x+r,  y+h);
+  pts.push([x + j(), y+h-r + j()]);
+  seg(x, y+h-r, x, y+r);
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [px, py] = pts[i-1], [cx, cy] = pts[i];
+    d += ` Q ${((px+cx)/2 + j()).toFixed(1)} ${((py+cy)/2 + j()).toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)}`;
+  }
+  return d + ' Z';
+}
+
+function shadeFor(tenant, bldg, rnd) {
+  if (tenant.cat === '미확인') return { fill: '#FBF6EC', stroke: '#D8C7AE', dash: '6 5' };
+  const lighten = 0.88 + rnd() * 0.18;   // 같은 동 안에서 업체마다 미묘하게 톤 변화
+  const c = parseInt(bldg.fill.slice(1), 16);
+  const mix = v => Math.min(255, Math.round(((c >> v) & 255) * lighten + 255 * (1 - lighten) * .55));
+  const fill = '#' + [16,8,0].map(mix).map(n => n.toString(16).padStart(2,'0')).join('');
+  return { fill, stroke: bldg.stroke, dash: 'none' };
+}
+
+function blockRect(floor, k) {
+  const b = floor.buildings.find(x => x.id === k.b);
+  const [c, r, cs, rs] = k.r;
+  return { b, x: b.x + c * b.cw, y: b.y + r * b.ch,
+           w: cs * b.cw - 5, h: rs * b.ch - 5 };
+}
+
+function buildMap() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const floor = FLOORS.find(f => f.id === curFloor);
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('id', 'mapSvg');
+  svg.setAttribute('viewBox', `0 0 ${floor.w} ${floor.h}`);
+  svg.setAttribute('width', floor.w * mapScale);
+
+  let defs = `
+    <defs>
+      <filter id="crayon" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="11" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
+      </filter>
+      <filter id="crayonSoft" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="4"/>
+      </filter>
+    </defs>`;
+
+  // 길(산책로)
+  let roadsHtml = '<g filter="url(#crayonSoft)">';
+  const rv = floor.roads.v;
+  if (rv) {
+    roadsHtml += `<rect x="${rv.x}" y="${rv.y}" width="${rv.w}" height="${rv.h}" rx="18"
+                   fill="#F0E2C4" opacity=".8"/>
+                  <line x1="${rv.x+rv.w/2}" y1="${rv.y+20}" x2="${rv.x+rv.w/2}" y2="${rv.y+rv.h-20}"
+                   stroke="#D8C29A" stroke-width="2.5" stroke-dasharray="10 12"/>`;
+  }
+  floor.roads.h.forEach(r => {
+    roadsHtml += `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="18"
+                   fill="#F0E2C4" opacity=".8"/>
+                  <line x1="${r.x+20}" y1="${r.y+r.h/2}" x2="${r.x+r.w-20}" y2="${r.y+r.h/2}"
+                   stroke="#D8C29A" stroke-width="2.5" stroke-dasharray="10 12"/>`;
+  });
+  roadsHtml += '</g>';
+
+  // 길 이름/장식
+  let decoHtml = '';
+  floor.deco.forEach(d => {
+    decoHtml += `<text class="decoText" x="${d.x}" y="${d.y}" text-anchor="middle"
+                  font-size="${d.s}">${d.text}</text>`;
+  });
+
+  svg.innerHTML = defs + roadsHtml + decoHtml;
+
+  const gAll = document.createElementNS(NS, 'g');
+  gAll.setAttribute('filter', 'url(#crayon)');
+
+  // 동 외곽선 + 라벨 칩
+  floor.buildings.forEach(b => {
+    const bw = b.cols * b.cw, bh = b.rows * b.ch;
+    const rndB = seedRand('bldg' + curFloor + b.id);
+    const outline = document.createElementNS(NS, 'path');
+    outline.setAttribute('d', crayonRectPath(b.x - 7, b.y - 7, bw + 14, bh + 14, 14, rndB));
+    outline.setAttribute('fill', b.fill);
+    outline.setAttribute('fill-opacity', '0.25');
+    outline.setAttribute('stroke', b.stroke);
+    outline.setAttribute('stroke-width', '1.6');
+    outline.setAttribute('stroke-dasharray', '7 6');
+    gAll.appendChild(outline);
+
+    const chip = document.createElementNS(NS, 'g');
+    chip.setAttribute('transform', `rotate(${(rndB()-0.5)*4} ${b.x+27} ${b.y-24})`);
+    chip.innerHTML =
+      `<rect x="${b.x-1}" y="${b.y-40}" width="56" height="30" rx="13" fill="${b.chip}" stroke="${b.stroke}" stroke-width="2.5"/>
+       <text class="bldgChip" x="${b.x+27}" y="${b.y-18}" text-anchor="middle" font-size="20" fill="#FFFFFF"
+             stroke="${b.stroke}" stroke-width=".6">${b.id}동</text>`;
+    gAll.appendChild(chip);
+  });
+
+  // 업체 블록 (여러 구역을 가진 업체는 가장 큰 구역에만 이름 표시)
+  tenants.filter(t => t.floor === curFloor).forEach(t => {
+    const rects = t.blocks.map(k => blockRect(floor, k));
+    const maxArea = Math.max(...rects.map(q => q.w * q.h));
+    rects.forEach((q, bi) => drawBlock(gAll, NS, t, q, q.w * q.h === maxArea, bi));
+  });
+
+  svg.appendChild(gAll);
+  if (editMode) drawSelection(svg, NS, floor);
+  svg.addEventListener('click', e => {
+    // 편집 모드에서 빈 곳을 누르면 선택 해제
+    if (editMode && !e.target.closest('.blk') && !e.target.closest('#selOverlay')) {
+      sel = null;
+      refreshSel();
+    }
+  });
+  const holder = document.getElementById('mapHolder');
+  holder.innerHTML = '';
+  holder.appendChild(svg);
+  applyFilter();
+}
+
+function splitLabel(nm, maxChars) {
+  if (nm.length <= maxChars) return [nm];
+  const mid = Math.floor(nm.length / 2);
+  let cut = -1;
+  for (let d = 0; d <= mid; d++) {
+    if (nm[mid - d] === ' ') { cut = mid - d; break; }
+    if (nm[mid + d] === ' ') { cut = mid + d; break; }
+  }
+  if (cut < 0) cut = Math.min(maxChars, mid);
+  const a = nm.slice(0, cut).trim(), b2 = nm.slice(cut).trim();
+  return [a, b2.length > maxChars ? b2.slice(0, maxChars - 1) + '…' : b2];
+}
+
+function drawBlock(parent, NS, t, q, showLabel, bi) {
+  const rnd = seedRand(t.id + q.x + q.y);
+  let { fill, stroke, dash } = shadeFor(t, q.b, rnd);
+  const visited = !!(reviews[t.id] || []).length;
+  if (visited && t.cat !== '미확인') fill = q.b.fill;   // 가본 곳은 꾹꾹 눌러 칠한 진한 톤
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('class', 'blk');
+  g.dataset.tid = t.id;
+  const rot = (rnd() - 0.5) * 1.6;
+  g.setAttribute('transform', `rotate(${rot.toFixed(2)} ${q.x + q.w/2} ${q.y + q.h/2})`);
+
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', crayonRectPath(q.x, q.y, q.w, q.h, Math.min(11, q.w/3), rnd));
+  path.setAttribute('class', 'body');
+  path.setAttribute('fill', fill);
+  path.setAttribute('stroke', stroke);
+  path.setAttribute('stroke-width', visited ? '3.6' : '2.6');
+  path.setAttribute('stroke-linejoin', 'round');
+  if (dash !== 'none') path.setAttribute('stroke-dasharray', dash);
+  g.appendChild(path);
+
+  const avg = avgOf(t.id);
+  const emoji = CAT_EMOJI[t.cat] || '';
+  if (showLabel && q.w >= 46) {
+    const maxChars = Math.max(2, Math.floor(q.w / 14));
+    let nm = t.name === '미확인' ? '?' : t.name;
+    const lines = q.h >= 48 ? splitLabel(nm, maxChars)
+                            : [nm.length > maxChars ? nm.slice(0, maxChars - 1) + '…' : nm];
+    const fs = q.w > 120 ? 16 : 13.5;
+    const lineH = fs + 3;
+    const blockMid = q.y + q.h / 2;
+    const totalH = lines.length * lineH + (avg ? 14 : 0);
+    let ty = blockMid - totalH / 2 + fs - 2;
+    const label = document.createElementNS(NS, 'text');
+    label.setAttribute('class', 'blkLabel');
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-size', fs);
+    lines.forEach((ln, i) => {
+      const ts = document.createElementNS(NS, 'tspan');
+      ts.setAttribute('x', q.x + q.w/2);
+      ts.setAttribute('y', ty + i * lineH);
+      ts.textContent = (i === 0 && q.w > 95 && lines.length === 1 ? emoji + ' ' : '') + ln;
+      label.appendChild(ts);
+    });
+    g.appendChild(label);
+    if (avg) {
+      const st = document.createElementNS(NS, 'text');
+      st.setAttribute('class', 'blkStars');
+      st.setAttribute('x', q.x + q.w/2);
+      st.setAttribute('y', ty + lines.length * lineH + 2);
+      st.setAttribute('text-anchor', 'middle');
+      st.setAttribute('font-size', 12);
+      st.textContent = '★' + avg.toFixed(1) + ` (${(reviews[t.id]||[]).length})`;
+      g.appendChild(st);
+    }
+  }
+
+  if (visited) {
+    // 여권 도장처럼 모서리에 삐뚤게 찍히는 방문 스탬프
+    const bx = q.x + q.w - 12, by = q.y + 12;
+    const badge = document.createElementNS(NS, 'g');
+    badge.setAttribute('transform', `rotate(${((rnd() - 0.5) * 36).toFixed(1)} ${bx} ${by})`);
+    badge.innerHTML =
+      `<circle cx="${bx}" cy="${by}" r="10.5" fill="#FFF8EE" fill-opacity=".9"
+               stroke="#E2674A" stroke-width="1.8" stroke-dasharray="3 2"/>
+       <text x="${bx}" y="${by + 4}" text-anchor="middle" font-size="11">🐾</text>`;
+    g.appendChild(badge);
+  }
+
+  g.addEventListener('click', () =>
+    editMode ? selectBlock(t.id, bi) : openSheet(t.id));
+  parent.appendChild(g);
+}
+
+function zoomMap(f) {
+  const floor = FLOORS.find(x => x.id === curFloor);
+  mapScale = Math.min(3, Math.max(0.5, mapScale * f));
+  document.getElementById('mapSvg').setAttribute('width', floor.w * mapScale);
+}
+
+/* ================= 층 전환 ================= */
+function buildFloorSwitch() {
+  const box = document.getElementById('floorSwitch');
+  box.innerHTML = '';
+  FLOORS.forEach(f => {
+    const btn = document.createElement('button');
+    btn.textContent = f.label;
+    btn.className = f.id === curFloor ? 'on' : '';
+    btn.onclick = () => {
+      curFloor = f.id;
+      sel = null;
+      buildFloorSwitch();
+      refreshSel();
+    };
+    box.appendChild(btn);
+  });
+}
+
+/* ================= 필터 ================= */
+function buildFilterChips() {
+  const bar = document.getElementById('filterBar');
+  const vbtn = document.createElement('button');
+  vbtn.className = 'chip';
+  vbtn.textContent = '🐾 가본 곳';
+  vbtn.onclick = () => {
+    onlyVisited = !onlyVisited;
+    vbtn.classList.toggle('on', onlyVisited);
+    applyFilter();
+  };
+  bar.appendChild(vbtn);
+  CATEGORIES.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (c === '전체' ? ' on' : '');
+    btn.textContent = c === '전체' ? '전체' : `${CAT_EMOJI[c] || ''} ${c}`;
+    btn.onclick = () => {
+      curCat = c;
+      [...bar.querySelectorAll('.chip')].forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      applyFilter();
+      renderRank(); renderFeed();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function matches(t) {
+  const q = document.getElementById('searchBox').value.trim();
+  if (onlyVisited && !(reviews[t.id] || []).length) return false;
+  if (curCat !== '전체' && t.cat !== curCat) return false;
+  if (q && !t.name.toLowerCase().includes(q.toLowerCase())) return false;
+  return true;
+}
+
+function applyFilter() {
+  document.querySelectorAll('.blk').forEach(g => {
+    const t = tenantById[g.dataset.tid];
+    g.classList.toggle('dim', !matches(t));
+  });
+}
+
+/* ================= 바텀 시트 (업체 상세 / 리뷰) ================= */
+function openSheet(tid) {
+  curTenant = tenantById[tid];
+  draftStars = 0; draftPhotos = [];
+  renderSheet();
+  document.getElementById('dimmer').classList.add('show');
+  document.getElementById('sheet').classList.add('show');
+}
+function closeSheet() {
+  document.getElementById('dimmer').classList.remove('show');
+  document.getElementById('sheet').classList.remove('show');
+}
+
+function renderSheet() {
+  const t = curTenant;
+  const rs = (reviews[t.id] || []).slice().sort((a,b) => b.ts - a.ts);
+  const avg = avgOf(t.id);
+  const sheet = document.getElementById('sheet');
+  sheet.innerHTML = `
+    <div class="grip"></div>
+    <h2>${CAT_EMOJI[t.cat] || ''} ${t.name === '미확인' ? '미확인 가게' : escapeHtml(t.name)}
+        <span class="catChip">${t.cat}</span></h2>
+    <div class="units">${locLabel(t)}</div>
+    ${t.verified ? '' : '<div class="unverified">✏️ 안내도 판독이 불확실한 상호예요 — 우측 상단 [편집]에서 바로 고칠 수 있어요</div>'}
+    <div class="avgLine">${avg
+      ? `<span class="stars">${starStr(avg)}</span> ${avg.toFixed(1)}점 · 리뷰 ${rs.length}개`
+      : '아직 리뷰가 없어요. 첫 발자국을 남겨보세요! 🐾'}</div>
+
+    <div class="formBox">
+      <div class="starInput" id="starInput">
+        ${[1,2,3,4,5].map(n => `<span data-n="${n}">★</span>`).join('')}
+      </div>
+      <textarea id="reviewText" placeholder="한 줄 평을 남겨주세요… (맛, 분위기, 가격 등)"></textarea>
+      <div class="photoRow" id="photoRow">
+        <button class="addBtn" onclick="document.getElementById('photoInput').click()">📷</button>
+      </div>
+      <button class="saveBtn" onclick="submitReview()">크레파스로 기록하기 🖍️</button>
+    </div>
+
+    <div id="reviewList">
+      ${rs.map(r => `
+        <div class="review">
+          <div class="head">
+            <span class="stars">${starStr(r.stars)}</span>
+            <span class="date">${fmtDate(r.ts)}</span>
+          </div>
+          ${r.text ? `<p>${escapeHtml(r.text)}</p>` : ''}
+          ${r.photos.length ? `<div class="feedPhotos">${
+              r.photos.map((p, i) => `<img src="${p}" onclick="showPhoto('${t.id}','${r.id}',${i})" alt="리뷰 사진">`).join('')
+            }</div>` : ''}
+          <button class="del" onclick="deleteReview('${t.id}','${r.id}')">지우기</button>
+        </div>`).join('')}
+    </div>`;
+
+  sheet.querySelectorAll('#starInput span').forEach(s => {
+    s.onclick = () => {
+      draftStars = +s.dataset.n;
+      sheet.querySelectorAll('#starInput span').forEach(x =>
+        x.classList.toggle('on', +x.dataset.n <= draftStars));
+    };
+  });
+}
+
+/* ---------- 사진 첨부 ---------- */
+document.getElementById('photoInput').addEventListener('change', async e => {
+  const files = [...e.target.files].slice(0, 4 - draftPhotos.length);
+  for (const f of files) draftPhotos.push(await compressImage(f));
+  e.target.value = '';
+  renderDraftPhotos();
+});
+
+function renderDraftPhotos() {
+  const row = document.getElementById('photoRow');
+  row.querySelectorAll('.thumb').forEach(n => n.remove());
+  draftPhotos.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'thumb';
+    d.innerHTML = `<img src="${p}" alt=""><button onclick="draftPhotos.splice(${i},1);renderDraftPhotos()">✕</button>`;
+    row.appendChild(d);
+  });
+}
+
+function compressImage(file) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 900;
+      const sc = Math.min(1, MAX / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas');
+      cv.width = img.width * sc; cv.height = img.height * sc;
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      res(cv.toDataURL('image/jpeg', 0.72));
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/* ---------- 리뷰 저장/삭제 ---------- */
+function submitReview() {
+  if (!draftStars) { alert('별점을 먼저 골라주세요 ⭐'); return; }
+  const text = document.getElementById('reviewText').value.trim();
+  (reviews[curTenant.id] = reviews[curTenant.id] || []).push({
+    id: 'r' + Date.now(),
+    stars: draftStars,
+    text,
+    photos: draftPhotos,
+    ts: Date.now(),
+  });
+  saveAll();
+  renderSheet(); buildMap(); renderRank(); renderFeed(); updateStamp();
+}
+
+function deleteReview(tid, rid) {
+  if (!confirm('이 리뷰를 지울까요?')) return;
+  reviews[tid] = (reviews[tid] || []).filter(r => r.id !== rid);
+  if (!reviews[tid].length) delete reviews[tid];
+  saveAll();
+  renderSheet(); buildMap(); renderRank(); renderFeed(); updateStamp();
+}
+
+function showPhoto(tid, rid, idx) {
+  const r = (reviews[tid] || []).find(r => r.id === rid);
+  if (!r) return;
+  document.getElementById('lightboxImg').src = r.photos[idx];
+  document.getElementById('lightbox').classList.add('show');
+}
+
+/* ================= 편집 모드 ================= */
+function toggleEdit() {
+  editMode = !editMode;
+  document.getElementById('editBtn').classList.toggle('on', editMode);
+  document.getElementById('editBar').style.display = editMode ? '' : 'none';
+  sel = null;
+  closeSheet();
+  switchTab('map');
+  refreshSel();
+}
+
+/* ----- 선택 & 도구 막대 ----- */
+function selectBlock(tid, bi) {
+  sel = { tid, bi };
+  refreshSel();
+}
+
+function refreshSel() {
+  buildMap();
+  renderSelBar();
+}
+
+function renderSelBar() {
+  const bar = document.getElementById('selBar');
+  if (!editMode || !sel || !tenantById[sel.tid]) { bar.style.display = 'none'; return; }
+  const t = tenantById[sel.tid];
+  bar.style.display = '';
+  bar.innerHTML = `
+    <b>🔶 ${t.name === '미확인' ? '미확인 가게' : escapeHtml(t.name)}</b>
+    <button onclick="openEditSheet('${t.id}')">✏️ 이름·종류</button>
+    <button onclick="addBlockToSel()">➕ 칸 추가</button>
+    <button onclick="removeSelBlock()">🗑 ${t.blocks.length > 1 ? '칸 빼기' : '가게 삭제'}</button>
+    <button onclick="sel=null;refreshSel()">✕ 해제</button>`;
+}
+
+/* ----- 선택 표시(주황 점선) + 이동/크기조절 손잡이 ----- */
+function drawSelection(svg, NS, floor) {
+  if (!sel) return;
+  const t = tenantById[sel.tid];
+  if (!t || t.floor !== curFloor) { sel = null; renderSelBar(); return; }
+  if (sel.bi >= t.blocks.length) sel.bi = 0;
+  const q = blockRect(floor, t.blocks[sel.bi]);
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('id', 'selOverlay');
+  g.innerHTML = `
+    <rect x="${q.x - 4}" y="${q.y - 4}" width="${q.w + 8}" height="${q.h + 8}" rx="10"
+          fill="rgba(255,138,101,.10)" stroke="#FF8A65" stroke-width="2.5"
+          stroke-dasharray="9 6" style="cursor:move;touch-action:none"/>
+    <circle cx="${q.x + q.w + 4}" cy="${q.y + q.h + 4}" r="10" fill="#FF8A65"
+            stroke="#fff" stroke-width="2.5" style="cursor:nwse-resize;touch-action:none"/>`;
+  const [body, handle] = g.children;
+  body.addEventListener('pointerdown', e => startDrag(e, 'move'));
+  handle.addEventListener('pointerdown', e => startDrag(e, 'resize'));
+  svg.appendChild(g);
+}
+
+function startDrag(e, mode) {
+  e.preventDefault(); e.stopPropagation();
+  const t = tenantById[sel.tid];
+  const k = t.blocks[sel.bi];
+  const floor = FLOORS.find(f => f.id === curFloor);
+  const bldg = floor.buildings.find(x => x.id === k.b);
+  const sx = e.clientX, sy = e.clientY;
+  const orig = [...k.r];
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const onMove = ev => {
+    ev.preventDefault();
+    const dx = (ev.clientX - sx) / mapScale;
+    const dy = (ev.clientY - sy) / mapScale;
+    let changed = false;
+    if (mode === 'move') {
+      const nc = clamp(orig[0] + Math.round(dx / bldg.cw), 0, bldg.cols - k.r[2]);
+      const nr = clamp(orig[1] + Math.round(dy / bldg.ch), 0, bldg.rows - k.r[3]);
+      changed = nc !== k.r[0] || nr !== k.r[1];
+      k.r[0] = nc; k.r[1] = nr;
+    } else {
+      const ncs = clamp(Math.round((orig[2] * bldg.cw + dx) / bldg.cw), 1, bldg.cols - k.r[0]);
+      const nrs = clamp(Math.round((orig[3] * bldg.ch + dy) / bldg.ch), 1, bldg.rows - k.r[1]);
+      changed = ncs !== k.r[2] || nrs !== k.r[3];
+      k.r[2] = ncs; k.r[3] = nrs;
+    }
+    if (changed) buildMap();   // 격자에 스냅될 때만 다시 그림
+  };
+  const onUp = () => {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    saveTenants();
+  };
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+}
+
+/* ----- 칸/가게 추가·삭제 ----- */
+function findFreeCell(floor, preferB, nearCR) {
+  const occ = {};
+  tenants.filter(t => t.floor === floor.id).forEach(t =>
+    t.blocks.forEach(k => {
+      for (let c = k.r[0]; c < k.r[0] + k.r[2]; c++)
+        for (let r = k.r[1]; r < k.r[1] + k.r[3]; r++)
+          occ[k.b + ':' + c + ':' + r] = true;
+    }));
+  const order = preferB
+    ? [floor.buildings.find(b => b.id === preferB),
+       ...floor.buildings.filter(b => b.id !== preferB)]
+    : floor.buildings;
+  for (const b of order) {
+    const cands = [];
+    for (let r = 0; r < b.rows; r++)
+      for (let c = 0; c < b.cols; c++)
+        if (!occ[b.id + ':' + c + ':' + r]) cands.push([c, r]);
+    if (!cands.length) continue;
+    if (nearCR && b.id === preferB)
+      cands.sort((p, q2) =>
+        (Math.abs(p[0] - nearCR[0]) + Math.abs(p[1] - nearCR[1])) -
+        (Math.abs(q2[0] - nearCR[0]) + Math.abs(q2[1] - nearCR[1])));
+    return { b: b.id, c: cands[0][0], r: cands[0][1] };
+  }
+  return { b: order[0].id, c: 0, r: 0 };  // 빈 칸이 없으면 일단 겹쳐서 생성
+}
+
+function addStore() {
+  const floor = FLOORS.find(f => f.id === curFloor);
+  const spot = findFreeCell(floor);
+  const t = {
+    id: 'custom-' + Date.now(), floor: curFloor,
+    name: '미확인', cat: '기타', verified: false,
+    blocks: [{ b: spot.b, r: [spot.c, spot.r, 1, 1] }],
+  };
+  tenants.push(t);
+  rebuildIndexes(); saveTenants();
+  sel = { tid: t.id, bi: 0 };
+  refreshSel();
+  openEditSheet(t.id);
+}
+
+function addBlockToSel() {
+  const t = tenantById[sel.tid];
+  const k = t.blocks[sel.bi];
+  const floor = FLOORS.find(f => f.id === curFloor);
+  const spot = findFreeCell(floor, k.b, [k.r[0], k.r[1]]);
+  t.blocks.push({ b: spot.b, r: [spot.c, spot.r, 1, 1] });
+  sel.bi = t.blocks.length - 1;
+  saveTenants(); refreshSel();
+}
+
+function removeSelBlock() {
+  const t = tenantById[sel.tid];
+  if (t.blocks.length > 1) {
+    t.blocks.splice(sel.bi, 1);
+    sel.bi = 0;
+  } else {
+    if (!confirm(`「${t.name}」 가게를 지도에서 삭제할까요?`)) return;
+    tenants = tenants.filter(x => x !== t);
+    sel = null;
+    rebuildIndexes();
+  }
+  saveTenants(); refreshSel();
+}
+
+function openEditSheet(tid) {
+  const t = tenantById[tid];
+  curTenant = t;
+  editCat = t.cat === '미확인' ? '식당' : t.cat;
+  const sheet = document.getElementById('sheet');
+  sheet.innerHTML = `
+    <div class="grip"></div>
+    <h2>✏️ ${locLabel(t)}</h2>
+    <div class="units">현재: ${t.name === '미확인' ? '미확인 가게' : escapeHtml(t.name)}</div>
+    <input class="nameInput" id="editName" placeholder="실제 상호명을 입력하세요"
+           value="${t.name === '미확인' ? '' : escapeHtml(t.name)}">
+    <div class="catSelect" id="catSelect">
+      ${CATEGORIES.filter(c => c !== '전체').map(c =>
+        `<button data-c="${c}" class="${c === editCat ? 'on' : ''}">${CAT_EMOJI[c] || ''} ${c}</button>`).join('')}
+    </div>
+    <div class="editActions">
+      <button class="primary" onclick="editApply('${t.id}')">💾 저장</button>
+    </div>
+    <div class="unverified" style="margin-top:10px">
+      📐 칸의 위치·크기는 시트를 닫고 지도에서 직접 드래그하세요 (모서리 ⬤ = 크기 조절)</div>`;
+  sheet.querySelectorAll('#catSelect button').forEach(btn => {
+    btn.onclick = () => {
+      editCat = btn.dataset.c;
+      sheet.querySelectorAll('#catSelect button').forEach(b2 =>
+        b2.classList.toggle('on', b2 === btn));
+    };
+  });
+  document.getElementById('dimmer').classList.add('show');
+  sheet.classList.add('show');
+}
+
+function editApply(tid) {
+  const t = tenantById[tid];
+  const name = document.getElementById('editName').value.trim();
+  if (name) { t.name = name; t.verified = true; }
+  t.cat = editCat;
+  saveTenants();
+  rebuildIndexes();
+  buildMap();
+  renderSelBar();
+  closeSheet();
+}
+
+function resetTenants() {
+  if (!confirm('편집 내용을 모두 버리고 data.js 파일의 데이터로 되돌릴까요?\n(리뷰는 지워지지 않아요)')) return;
+  localStorage.removeItem(LS_TENANTS);
+  location.reload();
+}
+
+function exportDataJs() {
+  const L = [];
+  L.push('/* 하우스디어반 상가 데이터 — 앱 편집 모드에서 내보낸 파일입니다.');
+  L.push('   이 파일을 프로젝트 폴더의 data.js에 덮어쓰면 영구 반영됩니다. */');
+  L.push('');
+  L.push('const FLOORS = ' + JSON.stringify(FLOORS, null, 2) + ';');
+  L.push('');
+  L.push('const TENANTS = [');
+  tenants.forEach(t => L.push(
+    `  { id:${JSON.stringify(t.id)}, floor:${JSON.stringify(t.floor)},` +
+    ` name:${JSON.stringify(t.name)}, cat:${JSON.stringify(t.cat)}, verified:${!!t.verified},` +
+    ` blocks:${JSON.stringify(t.blocks)} },`));
+  L.push('];');
+  L.push('');
+  L.push('const CATEGORIES = ' + JSON.stringify(CATEGORIES) + ';');
+  L.push('');
+  L.push('const CAT_EMOJI = ' + JSON.stringify(CAT_EMOJI, null, 2) + ';');
+  L.push('');
+  const blob = new Blob([L.join('\n')], { type: 'text/javascript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.js';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================= 랭킹 / 피드 / 스탬프 ================= */
+function renderRank() {
+  const page = document.getElementById('pageRank');
+  const rated = tenants
+    .filter(t => avgOf(t.id) !== null && (curCat === '전체' || t.cat === curCat))
+    .sort((a,b) => (avgOf(b.id) - avgOf(a.id)) || ((reviews[b.id]||[]).length - (reviews[a.id]||[]).length));
+  if (!rated.length) {
+    page.innerHTML = '<div class="empty">아직 평가한 가게가 없어요.<br>지도에서 가게를 눌러 첫 별점을 남겨보세요! ⭐</div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  page.innerHTML = rated.map((t, i) => {
+    const avg = avgOf(t.id), n = (reviews[t.id]||[]).length;
+    return `<div class="card" onclick="openSheet('${t.id}')">
+      <h3>${medals[i] ? `<span class="medal">${medals[i]}</span>` : `<span class="medal" style="font-size:16px;color:var(--ink-soft)">${i+1}위</span>`}
+          ${CAT_EMOJI[t.cat]||''} ${escapeHtml(t.name)}</h3>
+      <div class="sub">${locLabel(t)}</div>
+      <div class="stars">${starStr(avg)} <b style="color:var(--ink)">${avg.toFixed(1)}</b>
+        <span style="color:var(--ink-soft);font-size:14px">· 리뷰 ${n}개</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderFeed() {
+  const page = document.getElementById('pageFeed');
+  const all = [];
+  for (const [tid, rs] of Object.entries(reviews)) {
+    const t = tenantById[tid];
+    if (!t || (curCat !== '전체' && t.cat !== curCat)) continue;
+    rs.forEach(r => all.push({ t, r }));
+  }
+  all.sort((a,b) => b.r.ts - a.r.ts);
+  if (!all.length) {
+    page.innerHTML = '<div class="empty">아직 기록이 없어요.<br>동네 한 바퀴 돌고 와서 채워볼까요? 🚶</div>';
+    return;
+  }
+  page.innerHTML = all.map(({t, r}) => `
+    <div class="card" onclick="openSheet('${t.id}')">
+      <h3>${CAT_EMOJI[t.cat]||''} ${escapeHtml(t.name)}</h3>
+      <div class="sub">${fmtDate(r.ts)} · ${locLabel(t)}</div>
+      <div class="stars">${starStr(r.stars)}</div>
+      ${r.text ? `<p style="margin:4px 0 0;font-size:17px">${escapeHtml(r.text)}</p>` : ''}
+      ${r.photos.length ? `<div class="feedPhotos">${
+          r.photos.map((p,i) => `<img src="${p}" onclick="event.stopPropagation();showPhoto('${t.id}','${r.id}',${i})" alt="">`).join('')
+        }</div>` : ''}
+    </div>`).join('');
+}
+
+function updateStamp() {
+  const n = Object.keys(reviews).filter(id => tenantById[id]).length;
+  document.getElementById('stampCount').textContent = `🐾 스탬프 ${n}개`;
+}
+
+/* ================= 탭 ================= */
+function switchTab(tab) {
+  ['map','rank','feed'].forEach(t => {
+    document.getElementById('page' + t[0].toUpperCase() + t.slice(1)).style.display =
+      (t === tab) ? '' : 'none';
+    document.getElementById('tab' + t[0].toUpperCase() + t.slice(1))
+      .classList.toggle('on', t === tab);
+  });
+  if (tab === 'rank') renderRank();
+  if (tab === 'feed') renderFeed();
+}
+
+/* ================= 시작 ================= */
+buildFilterChips();
+buildFloorSwitch();
+buildMap();
+updateStamp();
+
+// PWA: 한 번 설치하면 오프라인에서도 동작 (https 또는 localhost에서만 등록됨)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
